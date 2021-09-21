@@ -19,19 +19,35 @@ class EntriesStore {
 	// https://stackoverflow.com/questions/55262053/reactjs-mobx-does-not-update-observable-array/55266004#55266004
 	@observable entries = [
 		{
-			key:1, 
 			destination:"Istanbul", 
 			country:"Turkey",
 			rating:"Good"
 		}, 
 		{
-			key:2, 
 			destination:"Cairo", 
 			country:"Egypt",
 			rating:"Good"
 		}
 	];
 	@observable filter = "";
+
+	@computed get filteredEntries() {
+		var matchesFilter = new RegExp(this.filter, "i");
+		return this.entries.filter(entry => !this.filter || matchesFilter.test(entry.destination));
+	}
+
+	createEntry(item) {
+		this.entries.push(item);
+	}
+
+	updateEntry(item) {
+		var sought = this.entries.find(entry => entry.destination === item.destination);
+		//sought.rating = item.rating;
+	}
+
+	deleteEntry(item) {
+		var sought = this.entries.find(entry => entry.destination === item.destination);
+	}
 }
 
 const entriesStore = new EntriesStore();
@@ -41,6 +57,7 @@ export default entriesStore;
 
  // debugging
 autorun(() => {
-	console.log(entriesStore.entries[0]); // debugging - In browser > Console, try, eg: `entriesStore.entries[0]={destination:'Delhi'}`
+	console.log(entriesStore.entries[0]); 
+	// debugging - In browser > Console, try, eg: `entriesStore.entries[0]={destination:'Delhi',country:'India',rating:'Good'}`
 	console.log(entriesStore.filter);
 })

@@ -1,16 +1,34 @@
 import React from "react";
 import { observer } from "mobx-react";
 import Entries from "./Entries";
+import entriesStore from "../EntriesStore";
 
 @observer
 class List extends React.Component {
-	render() {
-		var entries;
+	filter(e) {
+		this.props.store.filter = e.target.value;
+	}
 
-		if(this.props.store.entries !== null && this.props.store.entries.length > 0)
+	createEntry(e) {
+		var data = {
+			'destination': e.target.parentNode.childNodes[0].value, 
+			'country'    : e.target.parentNode.childNodes[1].value, 
+			'rating'     : e.target.parentNode.childNodes[2].value
+		};
+
+		this.props.store.createEntry(data);
+	}
+
+	render() {
+		var tableRows;
+
+		const {entries, filteredEntries, filter} = this.props.store;
+
+		if(entries !== null && entries.length > 0)
 		{
-			entries = this.props.store.entries.map(function(item){
-				return <Entries item={item} />
+			//tableRows = entries.map(function(item) {
+			tableRows = filteredEntries.map(function(item) {
+				return <Entries item={item} store={entriesStore} />
 			});
 		}
 
@@ -18,6 +36,9 @@ class List extends React.Component {
 			<div className='container'>
 			
 				<h1>Trip Advisor</h1>
+
+				<label>Search: </label>
+				<input value={filter} onChange={this.filter.bind(this)} />
 
 				<div className='row'>
 					<table className='table'>
@@ -29,11 +50,18 @@ class List extends React.Component {
 							</tr>
 						</thead>
 						<tbody>
-							{entries}
+							{tableRows}
 						</tbody>										
 					</table>
 				</div>
 				
+				<div className='row'>
+					<input type='text' name='destination' /> 
+					<input type='text' name='country' /> 
+					<input type='text' name='rating' /> 
+					<button type='button' onClick={this.createEntry.bind(this)}>New</button>
+				</div>
+
 			</div>
 		);
 	}
